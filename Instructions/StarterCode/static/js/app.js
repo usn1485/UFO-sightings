@@ -1,46 +1,76 @@
 // Get a reference to the table body
 var tbody = d3.select("tbody");
-var ufos=data;
-// Console.log the ufo sighting data from data.js
-//console.log(data);
+//Get a Data from Data.js
+var ufos=data;     
 
-
-data.forEach((ufodata) => {
+//
+ufos.forEach((ufodata) => {
     var row = tbody.append("tr");
     Object.entries(ufodata).forEach(([key, value]) => {
       var cell = row.append("td");
       cell.text(value);
     });
   });
-  
 
   //Event Listener filter-btn
 
   var filterbtn=d3.select("#filter-btn");
-
+  
   filterbtn.on("click",function(){
-    var inputElement=d3.select("#datetime");
-    var inputValue = inputElement.property("value");
+
+    var filteredData = ufos;
+
+    var inputDateValue= d3.select("#datetime").property("value");
+    var inputCityValue= d3.select("#City").property("value").toLowerCase().trim();
+    var inputStateValue= d3.select("#State").property("value").toLowerCase().trim();
+    var inputCountryValue= d3.select("#Country").property("value").toLowerCase().trim();
+    var inputShapeValue= d3.select("#Shape").property("value").toLowerCase().trim();
+    
+
+    var dictUser={ datetime:inputDateValue,
+                    city:inputCityValue,
+                    state:inputStateValue,
+                    country:inputCountryValue,
+                    shape:inputShapeValue
+                    }
+    /*var userinput= getelement()*/
+
+    Object.entries(dictUser).forEach(([key, value]) => {
+      if(value===""){
+        delete  dictUser[key];
+      }   
+     });
+
+
+   console.log(dictUser);
+
+
     console.log("Hi, a filter button was clicked");
-    console.log("inputValue :",inputValue)
-    //console.log(ufos);
+    console.log("inputValue :",dictUser);
+    
+    // Object.entries(dictUser).forEach(([key, value]) => {
+    //   console.log(key,value);
+    //   filteredData=filteredData.filter(row => row[key]===value);
+    // });
 
-    var Ufoscited=ufos.filter(ufo=>ufo.datetime===inputValue);
-    console.log("UfoFiltered:",Ufoscited)
-
+    filteredData = filteredData.filter(row => {
+      return Object.entries(dictUser).every(criteria => {
+        const key = criteria[0]
+        const value = criteria[1]
+        return row[key] === value
+      })
+    })
+    
     var tableContent=d3.select("tbody");
 
     //Empty table content before displaying new one 
     tableContent.html("");
 
-   Ufoscited.forEach((sufo) => {
-        var row = tbody.append("tr");
-        Object.entries(sufo).forEach(([key, value]) => {
-          var cell = row.append("td");
-          cell.text(value);
-        });
-      })
-
-    
-
-  });
+    filteredData.forEach((fData) => {
+      var row = tbody.append("tr");
+      Object.entries(fData).forEach(([key, value]) => {
+        var cell = row.append("td");
+        cell.text(value);
+      });
+    });
+   });
